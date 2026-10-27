@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard KPI 14 — POLIKK 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; background: #f0f4f8; color: #1f2328; font-size: 14px; line-height: 1.6; }
+
+  /* HEADER */
+  .header { background: #1a3a5c; color: white; padding: 16px 32px; display: flex; align-items: center; position: relative; }
+  .header-main { display: flex; align-items: center; justify-content: center; flex: 1; gap: 0; }
+  .header-logo-left { flex-shrink: 0; margin-right: 10px; }
+  .header-logo-right { flex-shrink: 0; margin-left: 10px; }
+  .header-logo-left img, .header-logo-right img { height: 52px; width: auto; object-fit: contain; background: white; border-radius: 6px; padding: 4px 8px; }
+  .header-center { text-align: center; }
+  .header-center h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.3px; }
+  .header-center p { font-size: 14px; color: #a8c4e0; margin-top: 2px; }
+  .header-badge { background: #2e6da4; border-radius: 6px; padding: 6px 14px; font-size: 12px; color: #cce0f5; text-align: right; flex-shrink: 0; }
+  .header-badge strong { display: block; font-size: 18px; color: white; }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+  .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #57606a; margin: 28px 0 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+
+  /* SCORECARDS */
+  .scorecard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .scorecard { background: white; border-radius: 10px; padding: 18px 20px; border: 1px solid #e5e7eb; }
+  .scorecard .label { font-size: 11px; color: #57606a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .scorecard .value { font-size: 32px; font-weight: 700; line-height: 1; }
+  .scorecard .sub { font-size: 11px; color: #57606a; margin-top: 4px; }
+  .scorecard .bar-bg { background: #e5e7eb; border-radius: 4px; height: 6px; margin-top: 10px; }
+  .scorecard .bar-fill { height: 6px; border-radius: 4px; }
+  .sc-blue .value { color: #1a3a5c; }
+  .sc-green .value { color: #276221; }
+  .sc-orange .value { color: #9c6500; }
+  .sc-red .value { color: #9c0006; }
+  .sc-blue .bar-fill { background: #3b82d4; }
+  .sc-green .bar-fill { background: #22a65a; }
+  .sc-orange .bar-fill { background: #f0a500; }
+
+  /* PROGRESS RING */
+  .progress-section { background: white; border-radius: 10px; border: 1px solid #e5e7eb; padding: 24px; display: flex; align-items: center; gap: 32px; }
+  .ring-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  .ring-center .pct { font-size: 22px; font-weight: 700; color: #1a3a5c; }
+  .ring-center .pct-lbl { font-size: 10px; color: #57606a; }
+  .progress-details { flex: 1; }
+  .progress-details h3 { font-size: 15px; font-weight: 700; color: #1a3a5c; margin-bottom: 12px; }
+  .item-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .item-bar-row .iname { font-size: 12px; width: 170px; flex-shrink: 0; color: #1f2328; }
+  .item-bar-row .ibar-bg { flex: 1; background: #e5e7eb; border-radius: 4px; height: 14px; }
+  .item-bar-row .ibar-fill { height: 14px; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; font-size: 10px; color: white; font-weight: 600; min-width: 20px; }
+  .item-bar-row .icount { font-size: 12px; font-weight: 700; width: 50px; text-align: right; color: #1f2328; }
+
+  /* JABATAN TABLE */
+  .jabatan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .jabatan-card { background: white; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; }
+  .jabatan-card .jab-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .jabatan-card .jab-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .jab-star { font-size: 16px; }
+  .jabatan-card .jab-fullname { font-size: 11px; color: #57606a; margin-top: 1px; }
+  .jabatan-card .jab-status { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+  .status-green { background: #C6EFCE; color: #276221; }
+  .status-yellow { background: #FFEB9C; color: #9C6500; }
+  .status-red { background: #FFC7CE; color: #9C0006; }
+  .jab-header.bg-green { background: #f0faf2; border-bottom: 1px solid #C6EFCE; }
+  .jab-header.bg-yellow { background: #fffbeb; border-bottom: 1px solid #FFEB9C; }
+  .jab-header.bg-red { background: #fff5f5; border-bottom: 1px solid #FFC7CE; }
+  .jabatan-card .jab-items { padding: 12px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .item-chip { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 500; }
+  .chip-done { background: #C6EFCE; color: #276221; }
+  .chip-pending { background: #f0f4f8; color: #57606a; border: 1px solid #e5e7eb; }
+  .chip-progress { background: #fff3cd; color: #9c6500; }
+  .jab-bahan { padding: 0 16px 12px; }
+  .bahan-row { font-size: 11px; color: #57606a; padding: 3px 0; border-top: 1px solid #f0f4f8; display: flex; gap: 6px; }
+  .bahan-row .btag { background: #e8f0fe; color: #3b82d4; border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+
+  /* POLIKK CARD */
+  .polikk-card { background: white; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; }
+  .polikk-card .pk-header { background: #1a3a5c; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .polikk-card .pk-header h3 { font-size: 14px; font-weight: 700; }
+  .polikk-card .pk-header span { font-size: 11px; color: #a8c4e0; }
+  .polikk-items { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .pk-item { padding: 16px 20px; border-right: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+  .pk-item:nth-child(2) { border-right: none; }
+  .pk-item:nth-child(3), .pk-item:nth-child(4) { border-bottom: none; }
+  .pk-item .pi-label { font-size: 11px; color: #57606a; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .pk-item .pi-count { font-size: 24px; font-weight: 700; color: #1a3a5c; }
+  .pk-item .pi-target { font-size: 11px; color: #57606a; }
+  .pk-item .pi-bahan { margin-top: 8px; }
+  .pk-item .pi-bahan-row { font-size: 11px; color: #57606a; padding: 2px 0; }
+  .pk-item .pi-bahan-row span { color: #3b82d4; font-weight: 600; }
+
+  /* SUKU TAHUN */
+  .suku-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+  .suku-table th { background: #1a3a5c; color: white; padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600; }
+  .suku-table td { padding: 10px 16px; font-size: 13px; border-bottom: 1px solid #e5e7eb; }
+  .suku-table tr:last-child td { border-bottom: none; }
+  .suku-table tr.current-row td { background: #f0f6ff; font-weight: 600; }
+  .badge-done { background: #C6EFCE; color: #276221; border-radius: 10px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+  .badge-pending { background: #fff3cd; color: #9c6500; border-radius: 10px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+  .badge-upcoming { background: #f0f4f8; color: #57606a; border-radius: 10px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+
+  /* DATA TABLE */
+  .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; font-size: 12px; }
+  .data-table th { background: #1a3a5c; color: white; padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; }
+  .data-table td { padding: 9px 12px; border-bottom: 1px solid #f0f4f8; vertical-align: top; }
+  .data-table tr:hover td { background: #f8fafc; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .item-badge { border-radius: 8px; padding: 2px 8px; font-size: 10px; font-weight: 700; }
+  .ib-1 { background: #dbeafe; color: #1e40af; }
+  .ib-2 { background: #dcfce7; color: #166534; }
+  .ib-4 { background: #fef3c7; color: #92400e; }
+  .shout-no { background: #FFC7CE; color: #9C0006; border-radius: 8px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
+
+  /* ALERT */
+  .alert { background: #fff5f5; border: 1px solid #FFC7CE; border-left: 4px solid #cc0000; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 12px; color: #6d0000; }
+  .alert strong { color: #cc0000; }
+
+  /* FOOTER */
+  .footer { text-align: center; font-size: 11px; color: #57606a; padding: 24px; border-top: 1px solid #e5e7eb; margin-top: 32px; }
+
+  @media (max-width: 700px) {
+    .scorecard-grid { grid-template-columns: repeat(2, 1fr); }
+    .jabatan-grid { grid-template-columns: 1fr; }
+    .polikk-items { grid-template-columns: 1fr; }
+    .progress-section { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-main">
+    <div class="header-logo-left">
+      <img src="Logo Politeknik Kota Kinabalu.png" alt="Logo Politeknik Kota Kinabalu">
+    </div>
+    <div class="header-center">
+      <h1>DASHBOARD KPI POLYCC 2026 — KPI14</h1>
+      <p>POLITEKNIK KOTA KINABALU</p>
+    </div>
+    <div class="header-logo-right">
+      <img src="Logo eLearning Polikk.png" alt="Logo eLearning POLIKK">
+    </div>
+  </div>
+  <div class="header-badge">
+    <span>Kemaskini Terakhir</span>
+    <strong id="lastUpdate"></strong>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ALERT -->
+  <div class="alert">
+    <strong>⚠️ Tindakan Diperlukan:</strong> 5 jabatan (JKA, JKE, JP, JPH, JPA) masih belum hantar e-Buku (Item 1). 3 jabatan (JKA, JPH, JPA) masih belum hantar Video AI (Item 4). Item 3 MCSA masih dalam pembangunan.
+  </div>
+
+  <!-- SCORECARDS -->
+  <div class="section-title">Ringkasan Pencapaian</div>
+  <div class="scorecard-grid">
+    <div class="scorecard sc-blue">
+      <div class="label">Item Terkumpul</div>
+      <div class="value">9</div>
+      <div class="sub">daripada 14 sasaran POLIKK</div>
+      <div class="bar-bg"><div class="bar-fill sc-blue" style="width:64.3%"></div></div>
+    </div>
+    <div class="scorecard sc-green">
+      <div class="label">Vs Sasaran Minimum (12)</div>
+      <div class="value">75%</div>
+      <div class="sub">9 / 12 item — Kategori 2</div>
+      <div class="bar-bg"><div class="bar-fill sc-green" style="width:75%"></div></div>
+    </div>
+    <div class="scorecard sc-orange">
+      <div class="label">Jabatan Lengkap</div>
+      <div class="value">2 / 7</div>
+      <div class="sub">JMSK &amp; JKM lengkap</div>
+      <div class="bar-bg"><div class="bar-fill sc-orange" style="width:28.6%"></div></div>
+    </div>
+    <div class="scorecard sc-red">
+      <div class="label">Item Masih Diperlukan</div>
+      <div class="value">5</div>
+      <div class="sub">untuk capai sasaran POLIKK 14</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:35.7%; background:#e05252;"></div></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS RING + ITEM BARS -->
+  <div class="section-title">Pecahan Mengikut Jenis Item</div>
+  <div class="progress-section">
+    <div class="ring-wrap">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" stroke-width="12"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#3b82d4" stroke-width="12"
+          stroke-dasharray="314" stroke-dashoffset="112" stroke-linecap="round"/>
+      </svg>
+      <div class="ring-center">
+        <div class="pct">64.3%</div>
+        <div class="pct-lbl">9/14 item</div>
+      </div>
+    </div>
+    <div class="progress-details">
+      <h3>Status Setiap Jenis Item</h3>
+      <div class="item-bar-row">
+        <div class="iname">Item 1 — e-Buku / AR</div>
+        <div class="ibar-bg"><div class="ibar-fill" style="width:28.6%; background:#3b82d4;">2</div></div>
+        <div class="icount">2 / 7</div>
+      </div>
+      <div class="item-bar-row">
+        <div class="iname">Item 2 — Video PdP</div>
+        <div class="ibar-bg"><div class="ibar-fill" style="width:100%; background:#22a65a;">3</div></div>
+        <div class="icount">3 / 1 ✅</div>
+      </div>
+      <div class="item-bar-row">
+        <div class="iname">Item 3 — MCSA</div>
+        <div class="ibar-bg"><div class="ibar-fill" style="width:5%; background:#e0e0e0;"></div></div>
+        <div class="icount">⏳ 0 / 1</div>
+      </div>
+      <div class="item-bar-row">
+        <div class="iname">Item 4 — Video AI</div>
+        <div class="ibar-bg"><div class="ibar-fill" style="width:100%; background:#f0a500;">7</div></div>
+        <div class="icount">7 / 7 ✅</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS JABATAN -->
+  <div class="section-title">Status Setiap Jabatan</div>
+  <div class="jabatan-grid">
+
+    <!-- JMSK -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-green">
+        <div><div class="jab-name">JMSK <span class="jab-star">⭐</span></div><div class="jab-fullname">Jabatan Matematik, Sains &amp; Komputer</div></div>
+        <div class="jab-status status-green">🟢 Lengkap</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-done">✅ Item 1 - e-Buku</span>
+        <span class="item-chip chip-done">✅ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row"><span class="btag">Item 1</span> Sistem Komputer (dengan AR) — Nurhazawani Yahya</div>
+        <div class="bahan-row"><span class="btag">Item 4</span> Basic Mathematics DBM10252 — Shahzan Hafiz et al.</div>
+      </div>
+    </div>
+
+    <!-- JKM -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-green">
+        <div><div class="jab-name">JKM <span class="jab-star">⭐</span></div><div class="jab-fullname">Jabatan Kejuruteraan Mekanikal</div></div>
+        <div class="jab-status status-green">🟢 Lengkap</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-done">✅ Item 1 - e-Buku</span>
+        <span class="item-chip chip-done">✅ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row"><span class="btag">Item 1</span> Pneumatic Basic Guide Symbol &amp; Circuit — Adil Arif bin Mat</div>
+        <div class="bahan-row"><span class="btag">Item 4</span> Introduction Fluid Mechanics — Aliudin Aziz et al. (NotebookLM)</div>
+      </div>
+    </div>
+
+    <!-- JKE -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-yellow">
+        <div><div class="jab-name">JKE</div><div class="jab-fullname">Jabatan Kejuruteraan Elektrik</div></div>
+        <div class="jab-status status-yellow">🟡 Separuh</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-pending">❌ Item 1 - e-Buku</span>
+        <span class="item-chip chip-done">✅ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row"><span class="btag">Item 4</span> Perjalanan Operating System — Rini Hafzah Abdul Rahim</div>
+        <div class="bahan-row"><span class="btag" style="background:#dcfce7;color:#166534;">Item 2</span> Perjalanan Tenaga Elektrik — Zainul Anwar Ahmad Zawawi (lebihan → PdP)</div>
+      </div>
+    </div>
+
+    <!-- JP -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-yellow">
+        <div><div class="jab-name">JP</div><div class="jab-fullname">Jabatan Perdagangan</div></div>
+        <div class="jab-status status-yellow">🟡 Separuh</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-pending">❌ Item 1 - e-Buku</span>
+        <span class="item-chip chip-done">✅ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row"><span class="btag">Item 4</span> Business Intelligence CC — Shazrin Neerwan (NotebookLM)</div>
+        <div class="bahan-row"><span class="btag" style="background:#dcfce7;color:#166534;">Item 2</span> FOM Chapter 1: Overview of Marketing (lebihan → PdP)</div>
+        <div class="bahan-row"><span class="btag" style="background:#dcfce7;color:#166534;">Item 2</span> FOM Chapter 4: Segmentation, Targeting &amp; Positioning (lebihan → PdP)</div>
+      </div>
+    </div>
+
+    <!-- JKA -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-red">
+        <div><div class="jab-name">JKA</div><div class="jab-fullname">Jabatan Kejuruteraan Awam</div></div>
+        <div class="jab-status status-red">🔴 Belum</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-pending">❌ Item 1 - e-Buku</span>
+        <span class="item-chip chip-pending">❌ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row" style="color:#9c0006;">Tiada submission diterima setakat ini.</div>
+      </div>
+    </div>
+
+    <!-- JPH -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-red">
+        <div><div class="jab-name">JPH</div><div class="jab-fullname">Jabatan Pelancongan &amp; Hospitaliti</div></div>
+        <div class="jab-status status-red">🔴 Belum</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-pending">❌ Item 1 - e-Buku</span>
+        <span class="item-chip chip-pending">❌ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row" style="color:#9c0006;">Tiada submission diterima setakat ini.</div>
+      </div>
+    </div>
+
+    <!-- JPA -->
+    <div class="jabatan-card">
+      <div class="jab-header bg-red">
+        <div><div class="jab-name">JPA</div><div class="jab-fullname">Jabatan Pengajian Am</div></div>
+        <div class="jab-status status-red">🔴 Belum</div>
+      </div>
+      <div class="jab-items">
+        <span class="item-chip chip-pending">❌ Item 1 - e-Buku</span>
+        <span class="item-chip chip-pending">❌ Item 4 - Video AI</span>
+      </div>
+      <div class="jab-bahan">
+        <div class="bahan-row" style="color:#9c0006;">Tiada submission diterima setakat ini.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- POLIKK INSTITUSI -->
+  <div class="section-title">Tanggungjawab POLIKK Institusi</div>
+  <div class="polikk-card">
+    <div class="pk-header">
+      <h3>POLIKK — Item Institusi (Pegawai eLearning)</h3>
+      <span>Item 2 &amp; Item 3</span>
+    </div>
+    <div class="polikk-items">
+      <div class="pk-item">
+        <div class="pi-label">Item 2 — Video PdP / VR / Video 360°</div>
+        <div class="pi-count" style="color:#22a65a;">3</div>
+        <div class="pi-target">Sasaran: 1 &nbsp;|&nbsp; Status: ✅ Melebihi Sasaran</div>
+        <div class="pi-bahan">
+          <div class="pi-bahan-row"><span>JKE:</span> Perjalanan Tenaga Elektrik (lebihan)</div>
+          <div class="pi-bahan-row"><span>JP:</span> FOM Chapter 1: Overview of Marketing (lebihan)</div>
+          <div class="pi-bahan-row"><span>JP:</span> FOM Chapter 4: Segmentation, Targeting &amp; Positioning (lebihan)</div>
+        </div>
+      </div>
+      <div class="pk-item">
+        <div class="pi-label">Item 3 — Digital MC Stand Alone (MCSA)</div>
+        <div class="pi-count" style="color:#9c6500;">⏳</div>
+        <div class="pi-target">Sasaran: 1 &nbsp;|&nbsp; Status: Dalam Pembangunan</div>
+        <div class="pi-bahan">
+          <div class="pi-bahan-row" style="color:#9c6500;">MCSA sedang dibangunkan oleh Pegawai eLearning. Akan dikemaskini apabila siap.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENARAI SEMUA BAHAN -->
+  <div class="section-title">Senarai Semua Bahan Diterima (9 Item)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Tarikh</th>
+        <th>S/T</th>
+        <th>Jabatan</th>
+        <th>Jenis Item</th>
+        <th>Tajuk</th>
+        <th>Penulis / Editor</th>
+        <th>SHOUT!STORE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td><td>17 Jul 2026</td><td>S3</td><td><b>JMSK</b></td>
+        <td><span class="item-badge ib-1">Item 1</span></td>
+        <td>Sistem Komputer (AR)</td>
+        <td>Nurhazawani Yahya et al.</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>2</td><td>12 Okt 2026</td><td>S4</td><td><b>JKM</b></td>
+        <td><span class="item-badge ib-1">Item 1</span></td>
+        <td>Pneumatic Basic Guide Symbol &amp; Circuit</td>
+        <td>Adil Arif bin Mat</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>3</td><td>24 Jun 2026</td><td>S2</td><td><b>JMSK</b></td>
+        <td><span class="item-badge ib-4">Item 4</span></td>
+        <td>Basic Mathematics DBM10252</td>
+        <td>Shahzan Hafiz, Siti Huzaima, Nurhazawani</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>4</td><td>16 Sep 2026</td><td>S3</td><td><b>JKE</b></td>
+        <td><span class="item-badge ib-4">Item 4</span></td>
+        <td>Perjalanan Operating System</td>
+        <td>Rini Hafzah Abdul Rahim</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>5</td><td>16 Sep 2026</td><td>S3</td><td><b>JKE</b></td>
+        <td><span class="item-badge ib-2">Item 2</span></td>
+        <td>Perjalanan Tenaga Elektrik <em style="color:#57606a;">(lebihan)</em></td>
+        <td>Zainul Anwar Ahmad Zawawi</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>6</td><td>12 Okt 2026</td><td>S4</td><td><b>JKM</b></td>
+        <td><span class="item-badge ib-4">Item 4</span></td>
+        <td>Introduction Fluid Mechanics (NotebookLM)</td>
+        <td>Aliudin Aziz, Hishamuddin Shah</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>7</td><td>20 Okt 2026</td><td>S4</td><td><b>JP</b></td>
+        <td><span class="item-badge ib-4">Item 4</span></td>
+        <td>Business Intelligence CC (NotebookLM)</td>
+        <td>Shazrin Neerwan Christopher</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>8</td><td>20 Okt 2026</td><td>S4</td><td><b>JP</b></td>
+        <td><span class="item-badge ib-2">Item 2</span></td>
+        <td>FOM Chapter 1: Overview of Marketing <em style="color:#57606a;">(lebihan)</em></td>
+        <td>Shazrin Neerwan Christopher</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+      <tr>
+        <td>9</td><td>20 Okt 2026</td><td>S4</td><td><b>JP</b></td>
+        <td><span class="item-badge ib-2">Item 2</span></td>
+        <td>FOM Chapter 4: Segmentation, Targeting &amp; Positioning <em style="color:#57606a;">(lebihan)</em></td>
+        <td>Shazrin Neerwan Christopher</td>
+        <td><span class="shout-no">Belum</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SUKU TAHUN -->
+  <div class="section-title">Garis Masa Pelaporan PERSYST 2.0</div>
+  <table class="suku-table">
+    <thead>
+      <tr>
+        <th>Suku Tahun</th>
+        <th>Tempoh Pengisian</th>
+        <th>Tarikh Pelaporan</th>
+        <th>Item Dilaporkan</th>
+        <th>Kumulatif</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>S1</b></td>
+        <td>1 Jan – 29 Mac 2026</td>
+        <td>14 Apr 2026</td>
+        <td>0 item</td>
+        <td>0</td>
+        <td><span class="badge-done">✅ Dilaporkan</span></td>
+      </tr>
+      <tr>
+        <td><b>S2</b></td>
+        <td>10 Apr – 21 Jun 2026</td>
+        <td>15 Jul 2026</td>
+        <td>1 item</td>
+        <td>1</td>
+        <td><span class="badge-done">✅ Dilaporkan</span></td>
+      </tr>
+      <tr>
+        <td><b>S3</b></td>
+        <td>9 Jul – 20 Sep 2026</td>
+        <td>14 Okt 2026</td>
+        <td>3 item</td>
+        <td>4</td>
+        <td><span class="badge-done">✅ Dilaporkan</span></td>
+      </tr>
+      <tr class="current-row">
+        <td><b>S4 ◀ Semasa</b></td>
+        <td>8 Okt – 14 Dis 2026</td>
+        <td>6 Jan 2027</td>
+        <td>5 item</td>
+        <td>9</td>
+        <td><span class="badge-pending">⏳ Belum Dilaporkan</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div class="footer">
+  <p>Dashboard KPI POLYCC 2026 — KPI14 &nbsp;|&nbsp; Unit eLearning, UIDM &nbsp;|&nbsp; Politeknik Kota Kinabalu &nbsp;|&nbsp; Data dikemaskini: <span id="footerDate"></span></p>
+  <p style="margin-top:6px; font-size:10px; color:#aaa;">Made with IBM Bob</p>
+</div>
+
+<script>
+  const now = new Date();
+  const opts = { day: 'numeric', month: 'long', year: 'numeric' };
+  const d = now.toLocaleDateString('ms-MY', opts);
+  document.getElementById('lastUpdate').textContent = d;
+  document.getElementById('footerDate').textContent = d;
+</script>
+
+</body>
+</html>
